@@ -106,39 +106,55 @@ public class Panel extends javax.swing.JPanel {
         // Création de l'objet BaseInformation
         BaseInformation bi = new BaseInformation("mysql", "com.mysql.jdbc.Driver", nomBase.getText(), "root", "", "//localhost");
 
-
         BaseSetting bs = new BaseSetting(bi);
 
         if (BaseSetting.getInstante().testerConnexion()) {
             JOptionPane.showMessageDialog(null, "Connexion OK", "Success", JOptionPane.INFORMATION_MESSAGE);
-        } 
+        }
     }//GEN-LAST:event_boutonTestConnexionActionPerformed
 
     private void requeteSQlActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_requeteSQlActionPerformed
         // TODO add your handling code here:
-        
+
         // Requête SQL
         BaseSetting.getInstante().select(requeteSQl.getText());
+
         try {
-            if(BaseSetting.getInstante().getResult_set().next()) {
-                
+            // Récupération du nombre de lignes + colonnes
+            BaseSetting.getInstante().getResult_set().last();
+            int nombreLignes = BaseSetting.getInstante().getResult_set().getRow();
+            BaseSetting.getInstante().getResult_set().beforeFirst();
+            int nombreColonnes = BaseSetting.getInstante().getResult_set().getMetaData().getColumnCount();
+
+            // Récupération de l'en-tête
+            String[] noms = new String[nombreColonnes];
+            for (int i = 0; i < noms.length; i++) {
+                noms[i] = BaseSetting.getInstante().getResult_set().getMetaData().getColumnName(i + 1);
+                System.out.println(BaseSetting.getInstante().getResult_set().getMetaData().getColumnClassName(i + 1));
             }
+
+            // Initialisation tableau
+            Object[][] o = new Object[nombreLignes][nombreColonnes];
+            int iterateur = 0;
+
+            while (BaseSetting.getInstante().getResult_set().next()) {
+                for (int i = 0; i < nombreColonnes; i++) {
+                    o[iterateur][i] = BaseSetting.getInstante().getResult_set().getObject(i+1);
+
+                }
+                iterateur++;
+            }
+
+            // Modification de l'arbre
+            jTable1.setModel(new javax.swing.table.DefaultTableModel(
+                    o,
+                    noms
+            ));
         } catch (SQLException ex) {
             Logger.getLogger(Panel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        // Modification de l'arbre
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
+
+
     }//GEN-LAST:event_requeteSQlActionPerformed
 
 

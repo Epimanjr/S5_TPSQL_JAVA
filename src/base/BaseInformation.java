@@ -64,9 +64,6 @@ public final class BaseInformation implements Serializable {
         this.login = login;
         this.password = password;
         this.url = url;
-
-        // Write information.
-        this.ecrireInformations();
     }
 
     /**
@@ -127,18 +124,15 @@ public final class BaseInformation implements Serializable {
      * Method which read all informations from infobdd.idb file.
      *
      * @return les informations utiles
+     * @throws java.io.IOException
+     * @throws java.lang.ClassNotFoundException
      */
-    public static BaseInformation lectureInformations() {
-        BaseInformation res = null;
-        try {
-            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("donnees/infobdd.idb"))) {
-                //On récupère simplement l'objet.
-                res = (BaseInformation) ois.readObject();
-            }
-        } catch (FileNotFoundException e) {
+    public static BaseInformation lectureInformations() throws IOException, ClassNotFoundException {
+        BaseInformation res;
 
-        } catch (IOException | ClassNotFoundException e) {
-
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("donnees/infobdd.idb"))) {
+            //On récupère simplement l'objet.
+            res = (BaseInformation) ois.readObject();
         }
 
         return res;
@@ -149,20 +143,14 @@ public final class BaseInformation implements Serializable {
      * information in the file.
      *
      * @return true if well-written
+     * @throws java.io.IOException
      */
-    public boolean ecrireInformations() {
-        try {
-            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("donnees/infobdd.idb"))) {
-                oos.writeObject(this);
-                return true;
-            }
-        } catch (FileNotFoundException e) {
-
-        } catch (IOException e) {
-
+    public boolean ecrireInformations() throws IOException {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("donnees/infobdd.idb"))) {
+            oos.writeObject(this);
+            return true;
         }
 
-        return false;
     }
 
 }
